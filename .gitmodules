@@ -1,3 +1,6 @@
 [submodule "ejudge_registration"]
 	path = ejudge_registration
 	url = https://github.com/grphil/ejudge-registration.git
+[submodule "polygon-to-ejudge"]
+	path = polygon-to-ejudge
+	url = https://github.com/grphil/polygon-to-ejudge.git

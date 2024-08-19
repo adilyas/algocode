@@ -35,6 +35,12 @@ class ContestInlineForm(forms.ModelForm):
         return super(ContestInlineForm, self).save(commit=commit)
 
 
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ['label', 'archive', 'contest']
+
+
 class ContestInline(admin.TabularInline):
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'rows': 1, 'cols': 20})},
@@ -561,9 +567,9 @@ class FormSheetExportAdmin(admin.ModelAdmin):
 
 
 # Better hide it from admin page and show only for editing
-# @admin.register(MailAuth)
-# class MailAuthAdmin(admin.ModelAdmin):
-#     formfield_overrides = {
-#         models.TextField: {'widget': Textarea(attrs={'rows': 1, 'cols': 40})},
-#     }
-#     list_display = ['id', 'name']
+@admin.register(MailAuth)
+class MailAuthAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 1, 'cols': 40})},
+    }
+    list_display = ['id', 'name']

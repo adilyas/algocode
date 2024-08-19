@@ -123,6 +123,14 @@ class Contest(models.Model, ContestType):
         return '[{}] {}'.format(self.course.label, self.title)
 
 
+class Report(models.Model):
+    label = models.CharField(max_length=100)
+    archive = models.FileField(upload_to='reports/')
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='reports')
+
+    def __str__(self):
+        return self.label
+
 class ContestStandingsHolder(models.Model):
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='standings_holder')
     problems = models.TextField()
@@ -238,6 +246,7 @@ class Standings(models.Model, ContestType):
     contest_type = models.CharField(max_length=2, choices=ContestType.TYPES, default=ContestType.ACM)
     enable_marks = models.BooleanField(default=False)
     disable_contest_marks = models.BooleanField(default=False)
+    enable_upsolving = models.BooleanField(default=False)
     js_for_contest_mark = models.TextField(blank=True,
                                            default="var newCalculateContestMark = function(\n    total_scores,       // двумерный массив пар балла и времени сдачи задач пользователями\n    user_id,            // номер пользователя\n    contest_info        // информация о контесте\n) {\n    return useOldContestMark(total_scores, user_id)\n};")
     js_for_total_mark = models.TextField(blank=True,
