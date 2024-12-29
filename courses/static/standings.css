@@ -62,6 +62,13 @@ td.bad {
     background-color: lightcoral;
 }
 
+td.region400 {
+    color: white;
+    font-weight: bold;
+    background-color: red;
+}
+
+
 td.gray {
     background-color: rgb(240, 240, 240);
 }

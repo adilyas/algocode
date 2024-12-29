@@ -383,13 +383,29 @@ var calculateInformation = function(users, contests) {
     });
 };
 
-var getScoreColor = function(score) {
+var getProblemScoreColor = function(score) {
     score = Math.min(score, 100);
     let red = parseInt(240 + (144 - 240) * Math.sqrt(score / 100));
     let green = parseInt(128 + (238 - 128) * Math.sqrt(score / 100));
     let blue = parseInt(128 + (144 - 128) * Math.sqrt(score / 100));
     return 'rgb(' + red + ',' + green + ',' + blue + ')';
 };
+
+var getTotalScoreColorDefault = function(score) {
+    score = Math.min(score, 100);
+    let red = parseInt(240 + (144 - 240) * Math.sqrt(score / 100));
+    let green = parseInt(128 + (238 - 128) * Math.sqrt(score / 100));
+    let blue = parseInt(128 + (144 - 128) * Math.sqrt(score / 100));
+    return 'rgb(' + red + ',' + green + ',' + blue + ')';
+};
+
+var getTotalScoreColor = function(score) {
+    return getTotalScoreColorDefault(score)
+};
+
+var updateTotalScoreClassName = function(score, className) {
+    return className;
+}
 
 var addProblemCell = function(row, problem) {
     let score = problem['score'];
@@ -407,7 +423,7 @@ var addProblemCell = function(row, problem) {
         }
         let cell = addCell(row, text, 'gray');
         if (text !== '') {
-            cell.style.backgroundColor = getScoreColor(score);
+            cell.style.backgroundColor = getProblemScoreColor(score);
         }
     } else if (is_blitz) {
         let bid = problem['bid'];
@@ -588,14 +604,19 @@ var fixColumnWidths = function (objs) {
     });
 };
 
-var addBody = function(body, users, contests) {
+var tweakUserNameCell = function(cell, user, contests) {
+    return;
+};
+
+var addBody = function(body, users, contests, add_contests) {
     for (let i = 0; i < users.length; i++) {
         let user = users[i];
         let id = user['id'];
         let row = body.insertRow();
         addCell(row, i + 1);
         addCell(row, user['group_short']);
-        addCell(row, user['name'], 'name');
+        let user_name_cell = addCell(row, user['name'], 'name');
+        tweakUserNameCell(user_name_cell, user, contests);
         addCell(row, user['score']);
         if (!is_olymp) {
             addCell(row, user['penalty']);
@@ -603,6 +624,9 @@ var addBody = function(body, users, contests) {
         if (enable_marks) {
             let cell = addCell(row, user['mark'].toFixed(2));
             cell.style.backgroundColor = getMarkColor(user['mark']);
+        }
+        if (!add_contests) {
+            continue;
         }
         contests.forEach(function (contest, idx) {
             let problems = contest['users'][id];
@@ -616,7 +640,8 @@ var addBody = function(body, users, contests) {
             }
             let cell = addCell(row, text, 'gray');
             if (is_olymp && user['scores'][idx] > 0) {
-                cell.style.backgroundColor = getScoreColor(user['scores'][idx] / problems.length);
+                cell.style.backgroundColor = getTotalScoreColor(user['scores'][idx] / problems.length);
+                cell.className = updateTotalScoreClassName(user['scores'][idx], cell.className)
             }
             else if (enable_marks && !disable_contest_marks && user['scores'][idx] > 0) {
                 cell.style.backgroundColor = getMarkColor(user['marks'][idx]);
@@ -670,9 +695,9 @@ var buildStandings = function() {
     table_fixed.appendChild(body_fixed);
     addHeader(header, contests);
     addHeader(body, contests);
-    addBody(body, users, contests);
+    addBody(body, users, contests, true);
     addHeader(body_fixed, []);
-    addBody(body_fixed, users, []);
+    addBody(body_fixed, users, contests, false);
     fixColumnWidths([header, body_fixed, body], contests);
 
     document.getElementsByClassName('wrapper')[0].addEventListener('scroll', function(e) {
